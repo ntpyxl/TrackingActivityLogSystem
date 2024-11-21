@@ -108,6 +108,7 @@ if(!isset($_SESSION['applicant_id'])) {
                         <td><?php echo $row['date_applied']?></td>
                         <td><?php echo $row['last_updated']?></td>
                         <td>
+                            // SHOULD NOT BE ABLE TO EDIT AND DELETE IF THIS IS NOT YOUR APPLICATION
                             <input type="submit" value="EDIT" onclick="window.location.href='editApplication.php?application_id=<?php echo $row['application_id']; ?>';">
                             <input type="submit" value="DELETE" onclick="window.location.href='deleteApplication.php?application_id=<?php echo $row['application_id']; ?>';">
                         </td>
@@ -133,6 +134,7 @@ if(!isset($_SESSION['applicant_id'])) {
                     <td><?php echo $row['date_applied']?></td>
                     <td><?php echo $row['last_updated']?></td>
                     <td>
+                        // SHOULD NOT BE ABLE TO EDIT AND DELETE IF THIS IS NOT YOUR APPLICATION
                         <input type="submit" value="EDIT" onclick="window.location.href='editApplication.php?application_id=<?php echo $row['application_id']; ?>';">
                         <input type="submit" value="DELETE" onclick="window.location.href='deleteApplication.php?application_id=<?php echo $row['application_id']; ?>';">
                     </td>

@@ -74,9 +74,10 @@ if(isset($_SESSION['applicant_id'])) {
             <label for="home_address">Home Address</label>
             <input type="text" name="home_address" id="home_address" required> <br>
 
+        <div style="display: flex; align-items: center;">
             <input type="submit" name="registerButton" value="Register account">
         </form>
-
             <input type="submit" name="returnButton" value="Return to login" onclick="window.location.href='login.php'">
+        </div>
     </body>
 </html>

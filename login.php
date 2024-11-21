@@ -27,9 +27,11 @@ if(isset($_SESSION['applicant_id'])) {
 
             <label for="password">Password</label>
             <input type="password" name="password" required> <br>
-
+                
+        <div style="display: flex; align-items: center;">
             <input type="submit" name="loginButton" value="Log in">
         </form>
             <input type="submit" name="registerButton" value="Register" onclick="window.location.href='register.php'">
+        </div>
     </body>
 </html>
