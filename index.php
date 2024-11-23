@@ -61,7 +61,7 @@ if(!isset($_SESSION['applicant_id'])) {
         <div style="display: flex; align-items: center;">
             <form action="<?php echo $_SERVER['PHP_SELF'];?>" method="GET">
                 <label for="searchBar">Search</label>
-                <input type="text" name="searchBar">
+                <input type="text" name="searchBar" value="<?php echo isset($_GET['searchBar']) ? $_GET['searchBar'] : ""?>">
                 <input type="submit" name="searchButton" value="Search application">
             </form>
             <input type="submit" name="clearButton" value="Clear search query" onclick="window.location.href='index.php'">
@@ -90,6 +90,8 @@ if(!isset($_SESSION['applicant_id'])) {
 
             <?php
             if(isset($_GET['searchButton'])) {
+                $log_desc = "Searched for: " . $_GET['searchBar'];
+                insertActivityLog($pdo, $log_desc, NULL, NULL, $_SESSION['applicant_id']);
                 $searchedApplicationsData = searchForApplication($pdo, $_GET['searchBar'])['querySet'];
                 foreach($searchedApplicationsData as $row) {
                     $local_applicantData = getApplicantByID($pdo, $row['applicant_id'])['querySet'];
@@ -107,11 +109,14 @@ if(!isset($_SESSION['applicant_id'])) {
                         <td><?php echo $row['experience_in_months']?></td>
                         <td><?php echo $row['date_applied']?></td>
                         <td><?php echo $row['last_updated']?></td>
-                        <td>
-                            // SHOULD NOT BE ABLE TO EDIT AND DELETE IF THIS IS NOT YOUR APPLICATION
-                            <input type="submit" value="EDIT" onclick="window.location.href='editApplication.php?application_id=<?php echo $row['application_id']; ?>';">
-                            <input type="submit" value="DELETE" onclick="window.location.href='deleteApplication.php?application_id=<?php echo $row['application_id']; ?>';">
-                        </td>
+                        <?php if($row['applicant_id'] == $_SESSION['applicant_id']) {?>
+                            <td>
+                                <input type="submit" value="EDIT" onclick="window.location.href='editApplication.php?application_id=<?php echo $row['application_id']; ?>';">
+                                <input type="submit" value="DELETE" onclick="window.location.href='deleteApplication.php?application_id=<?php echo $row['application_id']; ?>';">
+                            </td>
+                        <?php
+                        }
+                        ?>
                     </tr>
             <?php 
                 }
@@ -133,11 +138,14 @@ if(!isset($_SESSION['applicant_id'])) {
                     <td><?php echo $row['experience_in_months']?></td>
                     <td><?php echo $row['date_applied']?></td>
                     <td><?php echo $row['last_updated']?></td>
-                    <td>
-                        // SHOULD NOT BE ABLE TO EDIT AND DELETE IF THIS IS NOT YOUR APPLICATION
-                        <input type="submit" value="EDIT" onclick="window.location.href='editApplication.php?application_id=<?php echo $row['application_id']; ?>';">
-                        <input type="submit" value="DELETE" onclick="window.location.href='deleteApplication.php?application_id=<?php echo $row['application_id']; ?>';">
-                    </td>
+                    <?php if($row['applicant_id'] == $_SESSION['applicant_id']) {?>
+                        <td>
+                            <input type="submit" value="EDIT" onclick="window.location.href='editApplication.php?application_id=<?php echo $row['application_id']; ?>';">
+                            <input type="submit" value="DELETE" onclick="window.location.href='deleteApplication.php?application_id=<?php echo $row['application_id']; ?>';">
+                        </td>
+                    <?php
+                    }
+                    ?>
                 </tr>
             <?php 
                 }

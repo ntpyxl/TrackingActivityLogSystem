@@ -69,6 +69,7 @@ function editApplicant($pdo, $first_name, $last_name, $age, $birthdate, $gender,
             "statusCode" => "200",
             "message" => "Applicant " . $applicant_id . "'s profile edited successfully!"
         );
+        insertActivityLog($pdo, "Edited their profile", NULL, NULL, $_SESSION['applicant_id']);
     } else {
         $response = array(
             "statusCode" => "400",
@@ -141,6 +142,9 @@ function addApplication($pdo, $applicant_id, $subject_expertise, $experience_in_
             "statusCode" => "200",
             "message" => "Application submitted successfully!"
         );
+        $application_id = getRecentApplication($pdo)['querySet']['application_id'];
+        $application_data = getApplicationByID($pdo, $application_id)['querySet'];
+        insertActivityLog($pdo, "Submitted an application", $application_id, $application_data['applicant_id'], $_SESSION['applicant_id']);
     } else {
         $response = array(
             "statusCode" => "400",
@@ -165,10 +169,34 @@ function editApplicationByID($pdo, $subject_expertise, $experience_in_months, $a
             "statusCode" => "200",
             "message" => "Application " . $application_id . " edited successfully!"
         );
+        $application_data = getApplicationByID($pdo, $application_id)['querySet'];
+        insertActivityLog($pdo, "Edited an application", $application_id, $application_data['applicant_id'], $_SESSION['applicant_id']);
     } else {
         $response = array(
             "statusCode" => "400",
             "message" => "Failed to edit application " . $application_id . "!"
+        );
+    }
+    return $response;
+}
+
+function deleteApplicationByID($pdo, $application_id) {
+    $application_data = getApplicationByID($pdo, $application_id)['querySet'];
+    $query = "DELETE FROM applications WHERE application_id = ?";
+
+    $statement = $pdo -> prepare($query);
+    $executeQuery = $statement -> execute([$application_id]);
+
+    if($executeQuery) {
+        $response = array(
+            "statusCode" => "200",
+            "message" => "Application " . $application_id . " has been deleted!"
+        );
+        insertActivityLog($pdo, "Deleted an application", $application_id, $application_data['applicant_id'], $_SESSION['applicant_id']);
+    } else {
+        $response = array(
+            "statusCode" => "400",
+            "message" => "Failed to delete application " . $application_id . "!"
         );
     }
     return $response;
@@ -189,6 +217,28 @@ function getAllApplications($pdo) {
         $response = array(
             "statusCode" => "400",
             "message" => "Failed to get applications!"
+        );
+    }
+    return $response;
+}
+
+function getRecentApplication($pdo) {
+    $query = "SELECT * FROM applications
+            ORDER BY application_id DESC
+            LIMIT 1;";
+
+    $statement = $pdo -> prepare($query);
+    $executeQuery = $statement -> execute();
+
+    if($executeQuery) {
+        $response = array(
+            "statusCode" => "200",
+            "querySet" => $statement -> fetch()
+        );
+    } else {
+        $response = array(
+            "statusCode" => "400",
+            "message" => "Failed to get recent application!"
         );
     }
     return $response;
@@ -236,21 +286,41 @@ function searchForApplication($pdo, $searchQuery) {
     return $response;
 }
 
-function deleteApplicationByID($pdo, $application_id) {
-    $query = "DELETE FROM applications WHERE application_id = ?";
+function insertActivityLog($pdo, $log_desc, $application_id, $applicant_id, $done_by) {
+    $query = "INSERT INTO activity_logs (log_desc, application_id, applicant_id, done_by) VALUES (?, ?, ?, ?)";
 
     $statement = $pdo -> prepare($query);
-    $executeQuery = $statement -> execute([$application_id]);
+    $executeQuery = $statement -> execute([$log_desc, $application_id, $applicant_id, $done_by]);
 
     if($executeQuery) {
         $response = array(
             "statusCode" => "200",
-            "message" => "Application " . $application_id . " has been deleted!"
+            "message" => "Activity successfully logged!"
         );
     } else {
         $response = array(
             "statusCode" => "400",
-            "message" => "Failed to delete application " . $application_id . "!"
+            "message" => "Failed to log activity!"
+        );
+    }
+    return $response;
+}
+
+function getAllActivityLogs($pdo) {
+    $query = "SELECT * FROM activity_logs";
+
+    $statement = $pdo -> prepare($query);
+    $executeQuery = $statement -> execute();
+
+    if($executeQuery) {
+        $response = array(
+            "statusCode" => "200",
+            "querySet" => $statement -> fetchAll()
+        );
+    } else {
+        $response = array(
+            "statusCode" => "400",
+            "message" => "Failed to get activity logs!"
         );
     }
     return $response;
