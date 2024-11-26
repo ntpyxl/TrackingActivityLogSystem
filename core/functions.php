@@ -21,7 +21,7 @@ function addApplicant($pdo, $username, $password, $confirm_passwrd, $hashed_pass
     if(!validatePassword($password)) {
         $response = array(
             "statusCode" => "400",
-            "message" => "Password is invalid! Make sure it is 8 characters long, has both upper and lowercase letters, and has a number!" . $password
+            "message" => "Password is invalid! Make sure it is 8 characters long, has both upper and lowercase letters, and has a number!"
         );
         return $response;
     }
