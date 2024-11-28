@@ -42,14 +42,14 @@ if(!isset($_SESSION['applicant_id'])) {
             $activityLogsData = getAllActivityLogs($pdo)['querySet'];
             foreach($activityLogsData as $row) {
                 $applicantData = getApplicantByID($pdo, $row['applicant_id'])['querySet'];
-                $loggedInApplicantData = getApplicantByID($pdo, $_SESSION['applicant_id'])['querySet'];
+                $done_byApplicantData = getApplicantByID($pdo, $row['done_by'])['querySet'];
             ?>
                 <tr>
                     <td><?php echo $row['log_id']?></td>
                     <td><?php echo $row['log_desc']?></td>
                     <td><?php echo $row['application_id']?></td>
                     <td><?php echo $row['applicant_id'] == FALSE ? "" : $row['applicant_id'] . " - " . $applicantData['first_name'] . " " . $applicantData['last_name']?></td>
-                    <td><?php echo $row['done_by'] . " - " . $loggedInApplicantData['first_name'] . " " . $loggedInApplicantData['last_name']?></td>
+                    <td><?php echo $row['done_by'] . " - " . $done_byApplicantData['first_name'] . " " . $done_byApplicantData['last_name']?></td>
                     <td><?php echo $row['date_logged']?></td>
                 </tr>
             <?php
